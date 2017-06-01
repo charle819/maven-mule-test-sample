@@ -1,0 +1,14 @@
+{
+  "IndexFields": [
+    {
+      "NumberofActivities": "200",
+      "ClaimNumber": "23456P",
+      "ActionID": "343434P",
+      "Topic": "Topic",
+      "Body": "Body",
+      "Subject": "Subject",
+      "RelatedTo": "RaltedTo",
+      "Confidential": "Confidential"
+    }
+  ]
+}

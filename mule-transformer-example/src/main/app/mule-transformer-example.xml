@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <http:request-config name="HTTP_Request_Configuration" host="localhost" port="8082" doc:name="HTTP Request Configuration"/>
+    <flow name="mule-transformer-exampleFlow">
+        <file:inbound-endpoint path="/home/chinmay/Desktop/fileIN" responseTimeout="10000" doc:name="File"/>
+        <choice doc:name="Choice">
+            <when expression="#[message.outboundProperties.filename == &quot;activity.xml&quot;]">
+                <dw:transform-message doc:name="Transform Message" metadata:id="d0f275b5-7b50-4dec-b159-879fc8489e9b">
+                    <dw:input-payload mimeType="application/xml"/>
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	IndexFields: {	
+		"NumberofActivities" : payload.ImportSession.Batches.Batch.BatchFields.BatchField.@Value,
+		(payload.ImportSession.Batches.Batch.Documents.Document.IndexFields.*IndexField  map			
+			{
+				($.@Name) : $.@Value
+			}
+		)
+	}
+}]]></dw:set-payload>
+                </dw:transform-message>
+                <logger level="INFO" doc:name="Logger" message="Activit received  : #[payload]"/>
+            </when>
+            <otherwise>
+                <dw:transform-message doc:name="Transform Message" metadata:id="a4c6e18a-44f9-4162-93d7-f51285cc6bc8">
+                    <dw:input-payload mimeType="application/xml"/>
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	IndexFields:{
+		"NumberofActivities" : payload.ImportSession.Batches.Batch.BatchFields.BatchField.@Value,
+		(payload.ImportSession.Batches.Batch.Documents.Document.IndexFields.*IndexField  map {
+			
+			($.@Name) : $.@Value
+		})
+	}
+}]]></dw:set-payload>
+                </dw:transform-message>
+                <logger message="Notes Received  : #[payload]" level="INFO" doc:name="Logger"/>
+                <!-- <http:request config-ref="HTTP_Request_Configuration" path="/api/notes" method="POST" doc:name="HTTP"/> -->
+            </otherwise>
+        </choice>
+        <file:outbound-endpoint path="/home/chinmay/Desktop/fileOUT" responseTimeout="10000" doc:name="File" outputPattern="output.json"/>
+        <!-- <http:request config-ref="HTTP_Request_Configuration" path="/api/notes" method="POST" doc:name="Copy_of_HTTP"/> -->
+        
+    </flow>
+    
+</mule>

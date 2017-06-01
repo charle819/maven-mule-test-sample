@@ -1,0 +1,16 @@
+{
+    "inputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "#_custom_mule_metadata_type_#",
+            "typeId": "activit-xml"
+        }
+    },
+    "outputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "#_custom_mule_metadata_type_#",
+            "typeId": "activit-json"
+        }
+    },
+    "id": "d0f275b5-7b50-4dec-b159-879fc8489e9b",
+    "version": "5.2.0.0"
+}
